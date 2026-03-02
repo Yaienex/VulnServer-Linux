@@ -9,28 +9,13 @@
 #include <sys/types.h>
 #include <time.h> 
 
-
 #include "client_cli.h"
 // Constants
-const char* HELP_MESSAGE ="[i] Available commands:\n  - HELP\n  - TIME\n  - SAVE\n  - INFO\n  - ECHO\n  - EXIT\n";
+const char* HELP_MESSAGE ="[i] Available commands:\n  - HELP\n  - TIME\n  - INFO\n  - SAVE\n  - ECHO\n  - EXIT\n";
 const int RESPONSE_SIZE = 1028;
 //
 
 
-
-void exec_cmd(char *cmd, char* response){
-    FILE *fp = popen(cmd, "r");
-    char result[1024];
-    char concat[1024];
-    if(fgets(result, sizeof(result), fp) == NULL){
-        strcpy(response,"0");
-    }
-    while (fgets(result, sizeof(result), fp) != NULL) {
-        strcat(concat,result);
-    }
-    strcpy(response, concat);
-
-}
 
 char* printresponse(char *str, int info){
     char buffer[60];
@@ -52,7 +37,7 @@ int main(int argc, char *argv[])
     int listenfd = 0, client = 0;
     struct sockaddr_in serv_addr; 
 
-    char sendBuff[RESPONSE_SIZE];
+    char sendBuff[2000];
     time_t ticks; 
     char client_message[2000];
 
@@ -84,41 +69,39 @@ int main(int argc, char *argv[])
                         client_input(client);
                 }
                 else if (strncmp(client_message, "TIME", 4) == 0){
-                    
-                    printresponse(client_message,1);
-                    //Send the message back to client
                     ticks = time(NULL);
                     snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
-                    epilogue(client,sendBuff);
+                    write(client, sendBuff, strlen(sendBuff)); 
+                    client_input(client);
                 }
 
                 else if (strncmp(client_message, "INFO", 4) == 0){
                     char *printresponse_ptr = printresponse("",0);
                     snprintf(sendBuff, sizeof(sendBuff), "[i] INFO:\n %s : %p\n","buffer", &printresponse_ptr);
-                    epilogue(client,sendBuff);
+                    write(client, sendBuff, strlen(sendBuff));
+                    client_input(client);
                 }
 
                 else if (strncmp(client_message, "ECHO", 4) ==0){
-                    // We send back the client message 
-                    snprintf(sendBuff, sizeof(sendBuff),client_message);
-                    epilogue(client,sendBuff);
+                    // We treat the client_message as a string and we do not put it right away in the snprintf function
+                    snprintf(sendBuff, sizeof(sendBuff),"%s", client_message);
+                    write(client, sendBuff, strlen(sendBuff));
+                    client_input(client);
                 }
 
                 else if (strncmp(client_message, "SAVE", 4) ==0){
                     char *to_save = &client_message[5];
                     char cmd[RESPONSE_SIZE];
                     // Creating the command to save the payload
-                    snprintf(cmd,sizeof(cmd), "echo \"%s\" > %d_client_%d_save.txt",to_save,file_number++,client);
-                    // Executing the command
-                    char response[RESPONSE_SIZE];
-                    exec_cmd(cmd, response);
-
+                    // we swap "%s" with '%s' so everything inside of the string is treated as a character
+                    snprintf(cmd,sizeof(cmd), "echo '%s' > DB/%d_client_%d_save.txt",to_save,file_number++,client);
+                    // Instead of a custom function, we can use system which directly return the exit code
+                    int response = system(cmd);
+            
                     // Notification to client
-                    snprintf(sendBuff, sizeof(sendBuff),"Save on server : %s\nReturn code %s\n", to_save, response);
+                    snprintf(sendBuff, sizeof(sendBuff),"Save on server : %s\nReturn code %d\n", to_save, response);
                     epilogue(client,sendBuff);
                 }
-
-
 
                 else if (strncmp(client_message, "EXIT", 4) == 0){
                         write(client, "[i] Bye\n", 8); 

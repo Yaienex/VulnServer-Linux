@@ -11,13 +11,13 @@ This program should not be run on any production systems or networks as it is pu
 ## Prerequisites
 ```
 apt install gcc gcc-multilib
-wget https://raw.githubusercontent.com/ins1gn1a/VulnServer-Linux/master/vuln.c
 ```
-
 ## Compile
 ```
 gcc vuln.c -o vuln -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -m32
 ```
 
+## Exploits 
+A list of exploit is in the directory exploits. Don't look at it for more challenge ! I didn't list everything but I wrote some of the most common exploit for educational purpose
 ## References
 Inspiration from [Stephen Bradshaw's vulnserver](https://github.com/stephenbradshaw/vulnserver/)!

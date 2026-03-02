@@ -1,0 +1,8 @@
+vuln :
+- OOBW
+- OOBR
+- ROP Chains ?
+- cmd injection (done) + reverse shellcode 
+- format string (done)
+- shellcode injection
+- directory traversal
