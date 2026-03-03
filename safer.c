@@ -93,8 +93,8 @@ int main(int argc, char *argv[])
                     char *to_save = &client_message[5];
                     char cmd[RESPONSE_SIZE];
                     // Creating the command to save the payload
-                    // we swap "%s" with '%s' so everything inside of the string is treated as a character
-                    snprintf(cmd,sizeof(cmd), "echo '%s' > DB/%d_client_%d_save.txt",to_save,file_number++,client);
+       		    // we remove '' around %s 
+                    snprintf(cmd,sizeof(cmd), "echo %s > DB/%d_client_%d_save.txt",to_save,file_number++,client);
                     // executing the command
                     int code = system(cmd);
             
