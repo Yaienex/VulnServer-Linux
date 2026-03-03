@@ -5,4 +5,4 @@ vuln :
 - cmd injection (done) + reverse shellcode 
 - format string (done)
 - shellcode injection
-- directory traversal
+- directory traversal (to continue)

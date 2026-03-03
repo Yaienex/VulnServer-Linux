@@ -4,7 +4,7 @@ FLAGS=-fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -m32 -Wno-i
 all : vuln safe
 
 vuln:
-	$(COMP) -o vuln vuln.c $(FLAGS)
+	$(COMP) vuln.c -o vuln  $(FLAGS)
 
 safe:
 	$(COMP) -o safer safer.c $(FLAGS)
@@ -12,4 +12,4 @@ run:
 	./vuln
 
 clean:
-	rm vuln safer
+	rm vuln safer *.txt
