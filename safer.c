@@ -95,11 +95,11 @@ int main(int argc, char *argv[])
                     // Creating the command to save the payload
                     // we swap "%s" with '%s' so everything inside of the string is treated as a character
                     snprintf(cmd,sizeof(cmd), "echo '%s' > DB/%d_client_%d_save.txt",to_save,file_number++,client);
-                    // Instead of a custom function, we can use system which directly return the exit code
-                    int response = system(cmd);
+                    // executing the command
+                    int code = system(cmd);
             
                     // Notification to client
-                    snprintf(sendBuff, sizeof(sendBuff),"Save on server : %s\nReturn code %d\n", to_save, response);
+                    snprintf(sendBuff, sizeof(sendBuff),"Save on server : %s\nReturn code %d\n", to_save, code);
                     epilogue(client,sendBuff);
                 }
 

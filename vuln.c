@@ -17,21 +17,6 @@ const int RESPONSE_SIZE = 1028;
 //
 
 
-
-void exec_cmd(char *cmd, char* response){
-    FILE *fp = popen(cmd, "r");
-    char result[1024];
-    char concat[1024];
-    if(fgets(result, sizeof(result), fp) == NULL){
-        strcpy(response,"0");
-    }
-    while (fgets(result, sizeof(result), fp) != NULL) {
-        strcat(concat,result);
-    }
-    strcpy(response, concat);
-
-}
-
 char* printresponse(char *str, int info){
     char buffer[60];
     if(info){
@@ -55,6 +40,7 @@ int main(int argc, char *argv[])
     char sendBuff[RESPONSE_SIZE];
     time_t ticks; 
     char client_message[2000];
+    memset(client_message, 0, sizeof(client));
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serv_addr, '0', sizeof(serv_addr));
@@ -105,16 +91,14 @@ int main(int argc, char *argv[])
                 }
 
                 else if (strncmp(client_message, "SAVE", 4) ==0){
-                    char *to_save = &client_message[5];
+                    char *to_save = &client_message[4];
                     char cmd[RESPONSE_SIZE];
                     // Creating the command to save the payload
                     snprintf(cmd,sizeof(cmd), "echo \"%s\" > %d_client_%d_save.txt",to_save,file_number++,client);
                     // Executing the command
-                    char response[RESPONSE_SIZE];
-                    exec_cmd(cmd, response);
-
+                    int code = system(cmd);
                     // Notification to client
-                    snprintf(sendBuff, sizeof(sendBuff),"Save on server : %s\nReturn code %s\n", to_save, response);
+                    snprintf(sendBuff, sizeof(sendBuff),"Save on server : %s\nReturn code %d\n", to_save, code);
                     epilogue(client,sendBuff);
                 }
 
